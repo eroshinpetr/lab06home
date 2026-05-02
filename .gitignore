@@ -1,0 +1,9 @@
+_build/
+artifacts/
+*.tar.gz
+*.zip
+*.deb
+*.rpm
+*.msi
+*.dmg
+.DS_Store

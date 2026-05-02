@@ -1,0 +1,38 @@
+Building target platforms: aarch64
+Building for target aarch64
+error: Unable to open sqlite database /var/lib/rpm/rpmdb.sqlite: unable to open database file
+error: cannot open Packages index using sqlite - Операция не позволена (1)
+error: cannot open Packages database in /var/lib/rpm
++ umask 022
++ cd /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/BUILD/solver-0.1.0.0-build
++ mv /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/solver-0.1.0.0-Linux-aarch64 /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/tmpBBroot
++ RPM_EC=0
++ jobs -p
++ exit 0
++ umask 022
++ cd /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/BUILD/solver-0.1.0.0-build
++ /usr/bin/rm -rf /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/solver-0.1.0.0-Linux-aarch64
++ /usr/bin/mkdir -p /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM
++ /usr/bin/mkdir /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/solver-0.1.0.0-Linux-aarch64
++ [ -e /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/solver-0.1.0.0-Linux-aarch64 ]
++ rm -rf /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/solver-0.1.0.0-Linux-aarch64
++ mv /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/tmpBBroot /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/solver-0.1.0.0-Linux-aarch64
++ /usr/lib/rpm/brp-compress /usr
++ /usr/lib/rpm/brp-elfperms
++ /usr/lib/rpm/brp-strip /usr/bin/strip
++ /usr/lib/rpm/brp-strip-static-archive /usr/bin/strip
++ /usr/lib/rpm/brp-strip-comment-note /usr/bin/strip /usr/bin/objdump
++ /usr/lib/rpm/brp-remove-la-files
++ umask 022
++ cd /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/BUILD/solver-0.1.0.0-build
++ RPM_EC=0
++ jobs -p
++ exit 0
++ umask 022
++ cd /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/BUILD/solver-0.1.0.0-build
++ test -d /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/BUILD/solver-0.1.0.0-build
++ /usr/bin/chmod -Rf a+rX,u+w,g-w,o-w /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/BUILD/solver-0.1.0.0-build
++ rm -rf /home/vboxuser/workspace/projects/lab06home/_CPack_Packages/Linux/RPM/BUILD/solver-0.1.0.0-build
++ RPM_EC=0
++ jobs -p
++ exit 0

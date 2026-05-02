@@ -1,0 +1,13 @@
+Architecture: arm64
+Description: solver application package
+ Solver application package.
+ .
+ This package contains the solver binary built from the Formatter Inc. training project.
+ The solver application uses formatter_ex and solver_lib static libraries.
+Maintainer: eroshinpetr <eroshinpetr1@gmail.com>
+Package: solver
+Priority: optional
+Section: devel
+Version: 0.1.0.0-1
+Installed-Size: 80
+

@@ -1,0 +1,196 @@
+name: Build solver packages
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build-test:
+    name: Build solver
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ make
+
+      - name: Configure
+        run: |
+          cmake -S . -B _build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cmake --build _build --config Release
+
+  package-linux:
+    name: Package Linux
+    runs-on: ubuntu-latest
+    needs: build-test
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ make rpm zip
+
+      - name: Configure
+        run: |
+          cmake -S . -B _build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cmake --build _build --config Release
+
+      - name: Build TGZ package
+        run: |
+          cpack --config _build/CPackConfig.cmake -G TGZ
+
+      - name: Build ZIP package
+        run: |
+          cpack --config _build/CPackConfig.cmake -G ZIP
+
+      - name: Build DEB package
+        run: |
+          cpack --config _build/CPackConfig.cmake -G DEB
+
+      - name: Build RPM package
+        run: |
+          cpack --config _build/CPackConfig.cmake -G RPM
+
+      - name: Collect Linux packages
+        run: |
+          mkdir -p artifacts
+          cp _build/*.tar.gz artifacts/ 2>/dev/null || true
+          cp _build/*.zip artifacts/ 2>/dev/null || true
+          cp _build/*.deb artifacts/ 2>/dev/null || true
+          cp _build/*.rpm artifacts/ 2>/dev/null || true
+          ls -la artifacts
+
+      - name: Upload Linux packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: artifacts/*
+
+  package-macos:
+    name: Package macOS
+    runs-on: macos-latest
+    needs: build-test
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: |
+          cmake -S . -B _build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cmake --build _build --config Release
+
+      - name: Build DMG package
+        run: |
+          cpack --config _build/CPackConfig.cmake -G DragNDrop
+
+      -
+name: Collect macOS packages
+        run: |
+          mkdir -p artifacts
+          cp _build/*.dmg artifacts/ 2>/dev/null || true
+          ls -la artifacts
+
+      - name: Upload macOS packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-packages
+          path: artifacts/*
+
+  package-windows:
+    name: Package Windows
+    runs-on: windows-latest
+    needs: build-test
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install WiX
+        shell: pwsh
+        run: |
+          choco install wixtoolset -y
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake -S . -B _build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        shell: pwsh
+        run: |
+          cmake --build _build --config Release
+
+      - name: Build MSI package
+        shell: pwsh
+        run: |
+          cpack --config _build/CPackConfig.cmake -C Release -G WIX
+
+      - name: Collect Windows packages
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifacts
+          Copy-Item _build/*.msi artifacts/ -ErrorAction SilentlyContinue
+          Get-ChildItem artifacts
+
+      - name: Upload Windows packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-packages
+          path: artifacts/*
+
+  publish-release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - package-linux
+      - package-macos
+      - package-windows
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download all packages
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Show release assets
+        run: |
+          find release-assets -type f -maxdepth 2 -print
+
+      - name: Create release and upload assets
+        uses: softprops/action-gh-release@v3
+        with:
+          files: release-assets/*
+          generate_release_notes: true
