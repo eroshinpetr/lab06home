@@ -1,16 +1,19 @@
 #include "solver.h"
 
+#include <cmath>
 #include <stdexcept>
 
-void solve(float a, float b, float c, float& x1, float& x2)
-{
-    float d = (b * b) - (4 * a * c);
+void solve(float a, float b, float c, float& x1, float& x2) {
+  if (a == 0) {
+    throw std::invalid_argument("a must not be zero");
+  }
 
-    if (d < 0)
-    {
-        throw std::logic_error{"error: discriminant < 0"};
-    }
+  const float d = b * b - 4 * a * c;
 
-    x1 = (-b - std::sqrtf(d)) / (2 * a);
-    x2 = (-b + std::sqrtf(d)) / (2 * a);
+  if (d < 0) {
+    throw std::runtime_error("discriminant is negative");
+  }
+
+  x1 = (-b - std::sqrt(d)) / (2 * a);
+  x2 = (-b + std::sqrt(d)) / (2 * a);
 }
