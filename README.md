@@ -1,1 +1,94 @@
 <img width="1080" height="56" alt="Снимок экрана 2026-05-02 в 23 56 34" src="https://github.com/user-attachments/assets/3512a953-4a08-4bc3-8909-1ae11bad72f7" />
+```sh
+name: Build solver packages
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build solver
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ make
+
+      - name: Configure
+        run: |
+          cmake -S . -B _build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cmake --build _build --config Release
+
+  package-linux:
+    name: Package Linux
+    runs-on: ubuntu-latest
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ make rpm zip
+
+      - name: Configure
+        run: |
+          cmake -S . -B _build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cmake --build _build --config Release
+
+      - name: Build packages
+        run: |
+          cpack --config _build/CPackConfig.cmake -G TGZ
+          cpack --config _build/CPackConfig.cmake -G ZIP
+          cpack --config _build/CPackConfig.cmake -G DEB
+          cpack --config _build/CPackConfig.cmake -G RPM
+
+      - name: Collect packages
+        run: |
+          mkdir -p artifacts
+          cp _build/*.tar.gz artifacts/ 2>/dev/null || true
+          cp _build/*.zip artifacts/ 2>/dev/null || true
+          cp _build/*.deb artifacts/ 2>/dev/null || true
+          cp _build/*.rpm artifacts/ 2>/dev/null || true
+          ls -la artifacts
+
+      - name: Upload packages as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: artifacts/*
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
+          
+```
+Файл реализации
